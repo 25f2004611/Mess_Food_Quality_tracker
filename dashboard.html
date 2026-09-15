@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+
+
+<head>
+
+
+  <meta charset="UTF-8" />
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+  <title>Mess Food Monitoring System Dashboard</title>
+
+
+  <style>
+
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+    :root {
+
+
+      --bg: #f0faf6;
+
+
+      --surface: #ffffff;
+
+
+      --surface2: #e8f5ef;
+
+
+      --border: #c6e6d8;
+
+
+      --text: #0d2b20;
+
+
+      --muted: #5a7a6e;
+
+
+      --accent: #0f766e;
+
+
+      --accent-hover: #0d6460;
+
+
+      --accent2: #d97706;
+
+
+      
+
+
+      --good: #15803d;
+
+
+      --warn: #b45309;
+
+
+      --danger: #b91c1c;
+
+
+      --gold: #d97706;
+
+
+      --silver: #64748b;
+
+
+      --bronze: #92400e;
+
+
+      --topbar-bg: #134e4a;
+
+
+    }
+
+
+    body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+
+
+
+
+    /*  TOPBAR  */
+
+
+    .topbar {
+
+
+      background: var(--topbar-bg); color: white;
+
+
+      padding: 0 24px; height: 58px;
+
+
+      display: flex; align-items: center; gap: 14px;
+
+
+      position: sticky; top: 0; z-index: 100;
+
+
+      box-shadow: 0 2px 8px rgba(13,43,32,0.3);
+
+
+    }
+
+
+    .topbar .brand { font-weight: 800; font-size: 16px; letter-spacing: -0.3px; }
+
+
+    .topbar .role-badge { background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+
+    .topbar .user-name { font-size: 13px; opacity: 0.9; }
+
+
+    .topbar .user-info { margin-left: auto; font-size: 12px; opacity: 0.75; }
+
+
+    .topbar .btn-logout { background: rgba(255,255,255,0.15); border: none; color: white; padding: 5px 13px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; margin-left: 8px; }
+
+
+    .topbar .btn-logout:hover { background: rgba(255,255,255,0.28); }
+
+
+
+
+
+    /*  NAV TABS  */
+
+
+    .nav-tabs { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; padding: 0 24px; overflow-x: auto; }
+
+
+    .nav-tab { padding: 14px 20px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
+
+
+    .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: #f0faf6; }
+
+
+    .nav-tab:hover { color: var(--text); }
+
+
+
+
+
+    /*  PAGES  */
+
+
+    .page { display: none; padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+
+
+    .page.active { display: block; animation: slideUp 0.3s ease; }
+
+
+    @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+
+
+
+
+    /*  CARDS  */
+
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
+
+
+    .card-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+
+
+    @media(max-width:700px) { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+
+
+    .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 14px; }
+
+
+
+
+
+    /*  MEAL RATING  */
+
+
+    .meal-selector { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+
+
+    .meal-btn { padding: 9px 20px; border-radius: 30px; border: 2px solid var(--border); font-size: 13px; font-weight: 600; cursor: pointer; color: var(--muted); background: white; transition: all 0.2s; }
+
+
+    .meal-btn.active { border-color: var(--accent); color: var(--accent); background: #e6faf5; }
+
+
+    .meal-btn.done { border-color: var(--good); color: var(--good); background: #f0fdf4; }
+
+
+    .criteria-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+
+    @media(max-width:600px) { .criteria-grid { grid-template-columns: 1fr; } }
+
+
+    .criterion { background: var(--surface2); border-radius: 10px; padding: 14px 16px; }
+
+
+    .criterion .c-name { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+
+
+    .stars { display: flex; gap: 6px; }
+
+
+    .star { font-size: 28px; cursor: pointer; transition: transform 0.1s; color: #d1d5db; user-select: none; }
+
+
+    .star.lit { color: #f59e0b; }
+
+
+    .star:hover { transform: scale(1.2); }
+
+
+    .c-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+
+    textarea.feedback-box { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--text); resize: vertical; min-height: 70px; font-family: inherit; outline: none; }
+
+
+    textarea.feedback-box:focus { border-color: var(--accent); }
+
+
+
+
+
+    /*  BUTTONS  */
+
+
+    .btn-primary { background: var(--accent); color: white; border: none; padding: 11px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+
+
+    .btn-primary:hover { background: var(--accent-hover); }
+
+
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+
+
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+
+
+
+
+    /*  RATING BARS  */
+
+
+    .rating-bar-row { margin-bottom: 12px; }
+
+
+    .rating-bar-row .rb-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+
+
+    .rating-bar-bg { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+
+
+    .rating-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+
+
+
+
+
+    /*  MEAL SUMMARY ROW  */
+
+
+    .meal-summary-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+
+
+    .meal-summary-row:last-child { border-bottom: none; }
+
+
+    .meal-icon { font-size: 22px; width: 36px; text-align: center; }
+
+
+    .meal-name { font-size: 14px; font-weight: 600; flex: 1; }
+
+
+    .meal-score { font-size: 22px; font-weight: 800; width: 52px; text-align: right; }
+
+
+    .meal-rating-stars { font-size: 14px; }
+
+
+
+
+
+    /*  AI BLOCK  */
+
+
+    .ai-block { background: linear-gradient(135deg,#e6faf5,#fef3c7); border: 1px solid #a7f3d0; border-radius: 10px; padding: 14px 16px; font-size: 13px; line-height: 1.7; color: var(--text); }
+
+
+    .ai-block .ai-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--accent); margin-bottom: 6px; }
+
+
+
+
+
+    /*  TABLE  */
+
+
+    .rank-table-wrap { overflow-x: auto; }
+
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+
+    th { padding: 10px 12px; text-align: left; color: var(--muted); font-weight: 700; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 2px solid var(--border); white-space: nowrap; }
+
+
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+
+
+    tr:last-child td { border-bottom: none; }
+
+
+    tr:hover td { background: #f0faf6; }
+
+
+    .rank-medal { font-size: 18px; }
+
+
+    .rank-num { font-weight: 800; font-size: 15px; }
+
+
+    .score-pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+
+
+    .status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+
+
+    .pill-good { background: #dcfce7; color: #15803d; }
+
+
+    .pill-warn { background: #fef3c7; color: #b45309; }
+
+
+    .pill-danger { background: #fee2e2; color: #b91c1c; }
+
+
+    .pill-cancelled { background: #fde68a; color: #92400e; }
+
+
+    .score-hi { color: var(--good); }
+
+
+    .score-mid { color: var(--warn); }
+
+
+    .score-lo { color: var(--danger); }
+
+
+
+
+
+    /*  ACTION CARDS  */
+
+
+    .action-card { border-left: 4px solid var(--warn); background: #fffbeb; border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 12px; }
+
+
+    .action-card.danger { border-left-color: var(--danger); background: #fff1f2; }
+
+
+    .action-card .ac-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+
+
+    .action-card .ac-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+
+
+
+
+    /*  REPORT HEADER  */
+
+
+    .report-header { background: linear-gradient(135deg,#134e4a,#0f766e,#d97706); color: white; border-radius: 14px; padding: 28px 32px; margin-bottom: 20px; }
+
+
+    .report-header h2 { font-size: 20px; font-weight: 800; }
+
+
+    .report-header p { font-size: 13px; opacity: 0.85; margin-top: 6px; }
+
+
+    .report-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 20px; }
+
+
+    @media(max-width:600px) { .report-stats { grid-template-columns: 1fr 1fr; } }
+
+
+    .report-stat { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 14px 16px; }
+
+
+    .report-stat .rs-val { font-size: 26px; font-weight: 800; }
+
+
+    .report-stat .rs-label { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+
+
+
+
+    /*  MINI CHART  */
+
+
+    .mini-chart { width: 100%; height: 100px; display: block; margin-top: 8px; }
+
+
+
+
+
+    /*  TOAST  */
+
+
+    #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+
+
+    #toast.show { opacity: 1; }
+
+
+  </style>
+
+
+</head>
+
+
+<body>
+
+
+
+
+
+<div class="topbar">
+
+
+  <span class="brand"> Mess Food Monitoring System</span>
+
+
+  <span class="role-badge" id="topRoleBadge"></span>
+
+
+  <span class="user-name" id="topUserName"></span>
+
+
+  <span class="user-info" id="topUserInfo"></span>
+
+
+  <button class="btn-logout" onclick="doLogout()"> Logout</button>
+
+
+</div>
+
+
+<div class="nav-tabs" id="navTabs"></div>
+
+
+
+
+
+<!-- STUDENT: RATE -->
+
+
+<div class="page" id="page-rate">
+
+
+  <div class="section-title"> Today's Meal Rating</div>
+
+
+  <div class="card">
+
+
+    <div class="card-title"> Select Meal to Rate</div>
+
+
+    <div class="meal-selector" id="mealSelector"></div>
+
+
+    <div id="ratingForm"></div>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+<!-- SHARED: DAILY SUMMARY -->
+
+
+<div class="page" id="page-daily">
+
+
+  <div class="section-title"> Today's Summary</div>
+
+
+  <div id="dailySummaryContent"></div>
+
+
+</div>
+
+
+
+
+
+<!-- SUPER: DAILY INSPECTION -->
+
+
+<div class="page" id="page-super-rate">
+
+
+  <div class="section-title"> Superintendent Daily Inspection Rating</div>
+
+
+  <div class="card">
+
+
+    <div class="card-title"> Rate Today's Meals  Superintendent Inspection</div>
+
+
+    <div class="meal-selector" id="superMealSelector"></div>
+
+
+    <div id="superRatingForm"></div>
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+<!-- MANAGER/SUPER: PROGRESS -->
+
+
+<div class="page" id="page-progress">
+
+
+  <div class="section-title"> Mess Performance Dashboard</div>
+
+
+  <div id="progressContent"></div>
+
+
+</div>
+
+
+
+
+
+<!-- SHARED: MONTHLY RANKING -->
+
+
+<div class="page" id="page-monthly">
+
+
+  <div class="section-title"> Monthly Rankings  All Bihar Engineering Messes</div>
+
+
+  <div id="monthlyContent"></div>
+
+
+</div>
+
+
+
+
+
+<!-- GOVT PANEL -->
+
+
+<div class="page" id="page-govt">
+
+
+  <div class="section-title"> Government Authority Panel</div>
+
+
+  <div id="govtContent"></div>
+
+
+</div>
+
+
+
+
+
+<!-- NOTICES -->
+
+
+<div class="page" id="page-notices">
+
+
+  <div id="noticesContent"></div>
+
+
+</div>
+
+
+
+
+
+<div id="toast"></div>
+
+
+
+
+
+<script>
+
+
+// 
+
+
+//  CONFIG 
+
+
+// 
+
+
+const API_BASE = window.location.port === '5000' || window.location.protocol === 'file:'
+
+
+  ? 'http://localhost:5000/api'
+
+
+  : `${window.location.origin}/api`;
+
+
+
+
+
+//  GUARD: redirect to login if no session 
+
+
+let session = null;
+
+
+let _authToken = null;
+
+
+try {
+
+
+  const raw = localStorage.getItem('mfms_session');
+
+
+  _authToken = localStorage.getItem('mfms_token');
+
+
+  if (!raw || !_authToken) { window.location.replace('login.html'); }
+
+
+  else session = JSON.parse(raw);
+
+
+} catch { window.location.replace('login.html'); }
+
+
+
+
+
+function doLogout() {
+
+
+  localStorage.removeItem('mfms_session');
+
+
+  localStorage.removeItem('mfms_token');
+
+
+  window.location.replace('login.html');
+
+
+}
+
+
+
+
+
+//  API helpers 
+
+
+async function apiFetch(endpoint, options = {}) {
+
+
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+
+
+    ...options,
+
+
+    headers: {
+
+
+      'Content-Type': 'application/json',
+
+
+      'Authorization': `Bearer ${_authToken}`,
+
+
+      ...(options.headers || {}),
+
+
+    },
+
+
+  });
+
+
+  if (res.status === 401) { doLogout(); return null; }
+
+
+  const data = await res.json();
+
+
+  if (!res.ok) throw new Error(data.message || 'Request failed.');
+
+
+  return data;
+
+
+}
+
+
+async function apiGet(endpoint)       { return apiFetch(endpoint); }
+
+
+async function apiPost(endpoint, body){ return apiFetch(endpoint, { method:'POST', body: JSON.stringify(body) }); }
+
+
+
+
+
+// 
+
+
+//  DATA 
+
+
+// 
+
+
+const COLLEGES = [
+
+
+  { id:'bce',     name:'Bakhtiyarpur College of Engineering, Patna',            city:'Patna' },
+
+
+  { id:'mit',     name:'Muzaffarpur Institute of Technology, Muzaffarpur',      city:'Muzaffarpur' },
+
+
+  { id:'dce',     name:'Darbhanga College of Engineering, Darbhanga',           city:'Darbhanga' },
+
+
+  { id:'nce',     name:'Nalanda College of Engineering, Chandi',                city:'Nalanda' },
+
+
+  { id:'pec',     name:'Purnea College of Engineering, Purnea',                 city:'Purnea' },
+
+
+  { id:'gce-bh',  name:'Govt. Engineering College, Bhagalpur',                  city:'Bhagalpur' },
+
+
+  { id:'gce-ga',  name:'Govt. Engineering College, Gaya',                       city:'Gaya' },
+
+
+  { id:'gce-va',  name:'Govt. Engineering College, Vaishali (Hajipur)',         city:'Vaishali' },
+
+
+  { id:'gce-nw',  name:'Govt. Engineering College, Nawada',                     city:'Nawada' },
+
+
+  { id:'gce-sm',  name:'Govt. Engineering College, Samastipur',                 city:'Samastipur' },
+
+
+  { id:'gce-bx',  name:'Govt. Engineering College, Buxar',                      city:'Buxar' },
+
+
+  { id:'gce-jh',  name:'Govt. Engineering College, Jehanabad',                  city:'Jehanabad' },
+
+
+  { id:'gce-sh',  name:'Govt. Engineering College, Sheikhpura',                 city:'Sheikhpura' },
+
+
+  { id:'gce-si',  name:'Govt. Engineering College, Sitamarhi',                  city:'Sitamarhi' },
+
+
+  { id:'gce-su',  name:'Govt. Engineering College, Supaul',                     city:'Supaul' },
+
+
+  { id:'gce-ki',  name:'Govt. Engineering College, Kishanganj',                 city:'Kishanganj' },
+
+
+  { id:'gce-ar',  name:'Govt. Engineering College, Araria',                     city:'Araria' },
+
+
+  { id:'gce-ka',  name:'Govt. Engineering College, Kaimur (Bhabua)',            city:'Kaimur' },
+
+
+  { id:'gce-ct',  name:'Govt. Engineering College, East Champaran (Motihari)',  city:'East Champaran' },
+
+
+  { id:'gce-sa',  name:'Govt. Engineering College, Saharsa',                    city:'Saharsa' },
+
+
+  { id:'gce-mu',  name:'Govt. Engineering College, Munger',                     city:'Munger' },
+
+
+  { id:'gce-ro',  name:'Govt. Engineering College, Rohtas (Sasaram)',           city:'Rohtas' },
+
+
+  { id:'gce-au',  name:'Govt. Engineering College, Aurangabad',                 city:'Aurangabad' },
+
+
+  { id:'gce-ja',  name:'Govt. Engineering College, Jamui',                      city:'Jamui' },
+
+
+  { id:'gce-lk',  name:'Govt. Engineering College, Lakhisarai',                 city:'Lakhisarai' },
+
+
+  { id:'gce-sh2', name:'Govt. Engineering College, Sheohar',                    city:'Sheohar' },
+
+
+  { id:'gce-mp',  name:'Govt. Engineering College, Madhepura',                  city:'Madhepura' },
+
+
+  { id:'gce-go',  name:'Govt. Engineering College, Gopalganj',                  city:'Gopalganj' },
+
+
+  { id:'gce-wc',  name:'Govt. Engineering College, West Champaran (Bettiah)',   city:'West Champaran' },
+
+
+  { id:'gce-ma',  name:'Govt. Engineering College, Madhubani',                  city:'Madhubani' },
+
+
+  { id:'gce-be',  name:'Govt. Engineering College, Begusarai',                  city:'Begusarai' },
+
+
+  { id:'gce-kh',  name:'Govt. Engineering College, Khagaria',                   city:'Khagaria' },
+
+
+  { id:'mce',     name:'Motihari College of Engineering, Motihari',             city:'East Champaran' },
+
+
+  { id:'biet',    name:'Bhagalpur College of Engineering, Bhagalpur',           city:'Bhagalpur' },
+
+
+];
+
+
+const HOSTELS = {
+
+
+  'bce':['Boys Hostel 1','Boys Hostel 2','Boys Hostel 3','Girls Hostel 1'],
+
+
+  'mit':['Boys Hostel 1','Boys Hostel 2','Boys Hostel 3','Girls Hostel 1'],
+
+
+  'dce':['Boys Hostel 1','Boys Hostel 2','Boys Hostel 3','Girls Hostel 1'],
+
+
+  'nce':['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+
+
+  'pec':['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+
+
+  'gce-bh':['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+
+
+  'gce-ga':['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+
+
+  'gce-va':['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+
+
+  'biet':['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+
+
+};
+
+
+COLLEGES.forEach(c => { if (!HOSTELS[c.id]) HOSTELS[c.id] = ['Boys Hostel 1','Girls Hostel 1']; });
+
+
+
+
+
+const MEALS = [
+
+
+  { id:'breakfast', name:'Breakfast', icon:'', time:'7:009:00 AM' },
+
+
+  { id:'lunch',     name:'Lunch',     icon:'',  time:'12:302:30 PM' },
+
+
+  { id:'snacks',    name:'Snacks',    icon:'', time:'5:006:00 PM' },
+
+
+  { id:'dinner',    name:'Dinner',    icon:'', time:'8:0010:00 PM' },
+
+
+];
+
+
+const CRITERIA = [
+
+
+  { id:'taste',     name:'Taste & Flavour',          icon:'' },
+
+
+  { id:'hygiene',   name:'Hygiene & Cleanliness',    icon:'' },
+
+
+  { id:'quantity',  name:'Quantity & Portions',      icon:'' },
+
+
+  { id:'freshness', name:'Freshness of Ingredients', icon:'' },
+
+
+  { id:'variety',   name:'Menu Variety',             icon:'' },
+
+
+  { id:'service',   name:'Service & Behaviour',      icon:'' },
+
+
+];
+
+
+const SUPER_CRITERIA = [
+
+
+  { id:'taste',       name:'Taste & Flavour',           icon:'' },
+
+
+  { id:'hygiene',     name:'Kitchen & Serving Hygiene', icon:'' },
+
+
+  { id:'quantity',    name:'Quantity & Portions',       icon:'' },
+
+
+  { id:'freshness',   name:'Freshness of Ingredients',  icon:'' },
+
+
+  { id:'variety',     name:'Menu Variety',              icon:'' },
+
+
+  { id:'service',     name:'Staff Behaviour',           icon:'' },
+
+
+  { id:'punctuality', name:'Meal Served on Time',       icon:'' },
+
+
+  { id:'cleanliness', name:'Dining Area Cleanliness',   icon:'' },
+
+
+];
+
+
+
+
+
+//  PERSONS 
+
+
+const PERSONS = {
+
+
+  'bce':   { manager:{name:'Ramesh Kumar Sharma',id:'MGR-BCE-001',phone:'9431100001'}, super:{name:'Dr. Anil Kumar Singh',id:'SUP-BCE-001',phone:'9431200001'}, students:[{name:'Rohit Kumar',id:'22BCSE001',hostel:'Boys Hostel 1'},{name:'Priya Kumari',id:'22BCSE042',hostel:'Girls Hostel 1'}] },
+
+
+  'mit':   { manager:{name:'Suresh Prasad Yadav',id:'MGR-MIT-001',phone:'9431100002'}, super:{name:'Prof. Vinod Kumar',id:'SUP-MIT-001',phone:'9431200002'}, students:[{name:'Deepak Kumar',id:'22BCSE101',hostel:'Boys Hostel 1'}] },
+
+
+  'dce':   { manager:{name:'Manoj Kumar Jha',id:'MGR-DCE-001',phone:'9431100003'}, super:{name:'Dr. Rakesh Narayan',id:'SUP-DCE-001',phone:'9431200003'}, students:[{name:'Vikash Ranjan',id:'22BCSE201',hostel:'Boys Hostel 1'}] },
+
+
+  'gce-bh':{ manager:{name:'Sanjay Kumar Verma',id:'MGR-GBH-001',phone:'9431100006'}, super:{name:'Prof. R.N. Tiwari',id:'SUP-GBH-001',phone:'9431200006'}, students:[{name:'Rahul Kumar',id:'22BCSE501',hostel:'Boys Hostel 1'}] },
+
+
+};
+
+
+const getPersons = colId => PERSONS[colId] || { manager:{name:`Mess Manager`,id:`MGR-${colId.toUpperCase()}-001`,phone:'9431100000'}, super:{name:`Hostel Superintendent`,id:`SUP-${colId.toUpperCase()}-001`,phone:'9431200000'}, students:[{name:'Student',id:'22BCSE000',hostel:'Boys Hostel 1'}] };
+
+
+
+
+
+//  FEEDBACK 
+
+
+const FEEDBACK_GOOD = ['Food was really tasty today!','Breakfast was excellent  Poha fresh and spiced.','Clean serving area. Great improvement!','Portions generous, sabzi fresh.','Loved variety in dinner. Keep it up!','Chapatis soft and hot. Quick service.','Dal makhani was delicious.','Good quantity and hygiene today.'];
+
+
+const FEEDBACK_MID  = ['Food okay but needs more spices.','Quantity a bit less at dinner.','Sabzi slightly overcooked but edible.','Service slow during lunch rush.','Menu repetitive for past few days.','Chapatis little hard today.','Rice had some uncooked grains.'];
+
+
+const FEEDBACK_BAD  = ['Dal watery and tasteless today.','Found hair in food at lunch. Unhygienic!','Vegetables looked old, not fresh.','Plates not properly cleaned.','Very less quantity  students went hungry.','Cook rude when asked for extra roti.','Strong bad odour in kitchen area.','Food served cold, taste very bad.','Same menu 5th day in a row!'];
+
+
+
+
+
+let _seed = 42;
+
+
+function seededRand() { _seed = (_seed * 1664525 + 1013904223) & 0xffffffff; return ((_seed>>>0)/0xffffffff); }
+
+
+function resetSeed(v) { _seed = v >>> 0; }
+
+
+function pickFeedback(s) { return s>=4 ? FEEDBACK_GOOD[Math.floor(seededRand()*FEEDBACK_GOOD.length)] : s>=3 ? FEEDBACK_MID[Math.floor(seededRand()*FEEDBACK_MID.length)] : FEEDBACK_BAD[Math.floor(seededRand()*FEEDBACK_BAD.length)]; }
+
+
+
+
+
+//  HOSTEL PROFILES 
+
+
+//  UTILS 
+
+
+function mean(a){return a.length?a.reduce((s,x)=>s+x,0)/a.length:0;}
+
+
+function scoreColor(s){return s>=4?'var(--good)':s>=3?'var(--warn)':'var(--danger)';}
+
+
+function scoreClass(s){return s>=4?'score-hi':s>=3?'score-mid':'score-lo';}
+
+
+function scorePillClass(s){return s>=4?'pill-good':s>=3?'pill-warn':'pill-danger';}
+
+
+function starsHTML(s){let h='';for(let i=1;i<=5;i++)h+=`<span style="color:${i<=Math.round(s)?'#f59e0b':'#d1d5db'}"></span>`;return h;}
+
+
+function toast(msg,dur=3000){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),dur);}
+
+
+function today(){return new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
+
+
+function thisMonth(){return new Date().toLocaleDateString('en-IN',{month:'long',year:'numeric'});}
+
+
+
+
+
+//  NAV CONFIG 
+
+
+const NAV_CONFIG = {
+
+
+  student: [{id:'rate',label:"Rate Meal",icon:''},{id:'daily',label:"Today's Summary",icon:''},{id:'monthly',label:'Monthly Ranking',icon:''},{id:'notices',label:'Notices',icon:''}],
+
+
+  manager: [{id:'progress',label:'Mess Progress',icon:''},{id:'daily',label:"Today's Summary",icon:''},{id:'monthly',label:'Monthly Ranking',icon:''},{id:'notices',label:'Notices',icon:''}],
+
+
+  super:   [{id:'super-rate',label:'Daily Inspection',icon:''},{id:'progress',label:'Hostel Progress',icon:''},{id:'daily',label:"Today's Report",icon:''},{id:'monthly',label:'Monthly Ranking',icon:''},{id:'notices',label:'Notices',icon:''}],
+
+
+  govt:    [{id:'govt',label:'All Messes',icon:''},{id:'monthly',label:'Monthly Ranking',icon:''},{id:'notices',label:'Issue Notices',icon:''}],
+
+
+};
+
+
+const ROLE_LABELS = {student:'Student',manager:'Mess Manager',super:'Hostel Superintendent',govt:'Govt. Authority'};
+
+
+
+
+
+//  INIT 
+
+
+(function initApp() {
+
+
+  const r = session.role;
+
+
+  document.getElementById('topRoleBadge').textContent = ROLE_LABELS[r];
+
+
+  document.getElementById('topUserName').textContent = session.name || session.userId;
+
+
+  document.getElementById('topUserInfo').textContent = session.hostel ? `${session.hostel}  ${COLLEGES.find(c=>c.id===session.college)?.city || session.college || ''}` : 'Bihar DTE';
+
+
+  const nav = document.getElementById('navTabs');
+
+
+  NAV_CONFIG[r].forEach((tab,i) => {
+
+
+    const d = document.createElement('div');
+
+
+    d.className = 'nav-tab'+(i===0?' active':'');
+
+
+    d.textContent = `${tab.icon} ${tab.label}`;
+
+
+    d.onclick = () => switchPage(tab.id, d);
+
+
+    nav.appendChild(d);
+
+
+  });
+
+
+  switchPage(NAV_CONFIG[r][0].id);
+
+
+})();
+
+
+
+
+
+function switchPage(pageId, tabEl) {
+
+
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+
+
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+
+
+  const page = document.getElementById('page-'+pageId);
+
+
+  if (page) page.classList.add('active');
+
+
+  if (tabEl) tabEl.classList.add('active');
+
+
+  else document.querySelectorAll('.nav-tab').forEach(t=>{ if(t.textContent.includes(NAV_CONFIG[session.role].find(n=>n.id===pageId)?.label||'')) t.classList.add('active'); });
+
+
+  window.scrollTo({top:0,behavior:'smooth'});
+
+
+  renderPage(pageId);
+
+
+}
+
+
+function renderPage(id) {
+
+
+  switch(id) {
+
+
+    case 'rate':       renderRatePage(); break;
+
+
+    case 'super-rate': renderSuperRatePage(); break;
+
+
+    case 'daily':      renderDailySummary(); break;
+
+
+    case 'progress':   renderProgressPage(); break;
+
+
+    case 'monthly':    renderMonthlyRanking(); break;
+
+
+    case 'govt':       renderGovtPanel(); break;
+
+
+    case 'notices':    renderNoticesPage(); break;
+
+
+  }
+
+
+}
+
+
+
+
+
+//  STUDENT RATE 
+
+
+const todayRatings = {};
+let _ratingsLoaded = false;
+let activeMealId = null;
+
+
+
+
+
+function _renderMealSelector() {
+  const ms = document.getElementById('mealSelector'); ms.innerHTML='';
+  MEALS.forEach(m => { const done=!!todayRatings[m.id]; const b=document.createElement('div'); b.className='meal-btn'+(done?' done':'')+(activeMealId===m.id?' active':''); b.innerHTML=`${m.icon} ${m.name}<br><small>${m.time}</small>`; b.onclick=()=>{activeMealId=m.id;renderRatePage();}; ms.appendChild(b); });
+}
+
+async function renderRatePage() {
+  if (!activeMealId) activeMealId = MEALS[0].id;
+  _renderMealSelector();
+  if (!_ratingsLoaded) {
+    _ratingsLoaded = true;
+    try {
+      const saved = await apiGet('/ratings/today');
+      if (saved) Object.entries(saved).forEach(([mid, v]) => { todayRatings[mid] = { ratings: v.criteria, feedback: v.feedback }; });
+    } catch(e) { /* network error - continue with empty */ }
+    _renderMealSelector();
+  }
+
+
+  const form=document.getElementById('ratingForm');
+
+
+  if(!activeMealId){form.innerHTML=`<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0">Select a meal above to rate it.</p>`;return;}
+
+
+  const meal=MEALS.find(m=>m.id===activeMealId); const ex=todayRatings[activeMealId]; const rats=ex?ex.ratings:{}; const fb=ex?ex.feedback:'';
+
+
+  form.innerHTML=`<div class="card-title">${meal.icon} Rate ${meal.name}  ${meal.time}</div><div class="criteria-grid" id="criteriaGrid"></div><div class="form-group" style="margin-bottom:14px"><label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block"> Additional Feedback (optional)</label><textarea class="feedback-box" id="feedbackBox" placeholder="Any specific complaint or suggestion">${fb}</textarea></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn-primary" onclick="submitRating()" ${ex?'style="background:var(--good)"':''}>${ex?' Update Rating':' Submit Rating'}</button>${ex?`<span style="color:var(--good);font-size:13px;font-weight:600">Submitted </span>`:''}</div>`;
+
+
+  const grid=document.getElementById('criteriaGrid');
+
+
+  CRITERIA.forEach(c=>{const val=rats[c.id]||0;const d=document.createElement('div');d.className='criterion';d.innerHTML=`<div class="c-name">${c.icon} ${c.name}</div><div class="stars" id="stars-${c.id}" data-val="${val}">${[1,2,3,4,5].map(i=>`<span class="star${i<=val?' lit':''}" onclick="setStar('${c.id}',${i})" data-i="${i}">&#9733;</span>`).join('')}</div><div class="c-labels"><span>Poor</span><span>Excellent</span></div>`;grid.appendChild(d);});
+
+
+}
+
+
+function setStar(cid,val){const c=document.getElementById(`stars-${cid}`);c.dataset.val=val;c.querySelectorAll('.star').forEach(s=>s.classList.toggle('lit',parseInt(s.dataset.i)<=val));}
+
+
+async function submitRating(){
+
+
+  const rats={};let ok=true;
+
+
+  CRITERIA.forEach(c=>{const v=parseInt(document.getElementById(`stars-${c.id}`)?.dataset.val||0);if(!v)ok=false;rats[c.id]=v;});
+
+
+  if(!ok){toast('Please rate all criteria');return;}
+
+
+  const fb=document.getElementById('feedbackBox').value;
+
+
+  try {
+
+
+    await apiPost('/ratings', { mealId: activeMealId, criteria: rats, feedback: fb });
+
+
+    todayRatings[activeMealId]={ratings:rats,feedback:fb};
+
+
+    toast(` ${MEALS.find(m=>m.id===activeMealId).name} rating submitted!`);
+
+
+    renderRatePage();
+
+
+  } catch(e) { toast(` ${e.message}`); }
+
+
+}
+
+
+
+
+
+//  SUPER RATE 
+
+
+const superTodayRatings = {};
+let _superRatingsLoaded = false;
+let activeSuperMealId = null;
+
+
+
+
+
+async function renderSuperRatePage() {
+  if (!_superRatingsLoaded) {
+    _superRatingsLoaded = true;
+    if (!activeSuperMealId) activeSuperMealId = MEALS[0].id;
+    try {
+      const saved = await apiGet('/ratings/today');
+      if (saved) Object.entries(saved).forEach(([mid, v]) => { superTodayRatings[mid] = { ratings: v.criteria, feedback: v.feedback }; });
+    } catch(e) { /* continue */ }
+  }
+
+
+  const ms=document.getElementById('superMealSelector');ms.innerHTML='';
+
+
+  MEALS.forEach(m=>{const done=!!superTodayRatings[m.id];const b=document.createElement('div');b.className='meal-btn'+(done?' done':'')+(activeSuperMealId===m.id?' active':'');b.innerHTML=`${m.icon} ${m.name}<br><small>${m.time}</small>`;b.onclick=()=>{activeSuperMealId=m.id;renderSuperRatePage();};ms.appendChild(b);});
+
+
+  const form=document.getElementById('superRatingForm');
+
+
+  if(!activeSuperMealId){form.innerHTML=`<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0">Select a meal above to record your inspection.</p>`;return;}
+
+
+  const meal=MEALS.find(m=>m.id===activeSuperMealId);const ex=superTodayRatings[activeSuperMealId];const rats=ex?ex.ratings:{};const fb=ex?ex.feedback:'';const p=getPersons(session.college);
+
+
+  form.innerHTML=`<div style="background:var(--surface2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;"><strong>Inspector:</strong> ${p.super.name} &nbsp;|&nbsp; <strong>ID:</strong> ${p.super.id} &nbsp;|&nbsp; <strong>Hostel:</strong> ${session.hostel} &nbsp;|&nbsp; <strong>Date:</strong> ${new Date().toLocaleDateString('en-IN')}</div><div class="card-title">${meal.icon} Inspecting ${meal.name}  ${meal.time}</div><div class="criteria-grid" id="superCriteriaGrid"></div><div class="form-group" style="margin-bottom:14px"><label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block"> Superintendent Remarks</label><textarea class="feedback-box" id="superFeedbackBox" placeholder="Specific observations, complaints or commendations">${fb}</textarea></div><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn-primary" onclick="submitSuperRating()" ${ex?'style="background:var(--good)"':''}>${ex?' Update Inspection':' Submit Inspection'}</button>${ex?`<span style="color:var(--good);font-size:13px;font-weight:600">Inspection recorded </span>`:''}</div>`;
+
+
+  const grid=document.getElementById('superCriteriaGrid');
+
+
+  SUPER_CRITERIA.forEach(c=>{const val=rats[c.id]||0;const d=document.createElement('div');d.className='criterion';d.innerHTML=`<div class="c-name">${c.icon} ${c.name}</div><div class="stars" id="sstars-${c.id}" data-val="${val}">${[1,2,3,4,5].map(i=>`<span class="star${i<=val?' lit':''}" onclick="setSuperStar('${c.id}',${i})" data-i="${i}">&#9733;</span>`).join('')}</div><div class="c-labels"><span>Poor</span><span>Excellent</span></div>`;grid.appendChild(d);});
+
+
+  // Comparison card: today's DB summary vs superintendent ratings
+
+
+  if(Object.keys(superTodayRatings).length>0){
+
+
+    try {
+
+
+      const todaySummary = await apiGet('/summary/today');
+
+
+      if(todaySummary&&todaySummary.meals){
+
+
+        let h='<div class="card" style="margin-top:16px"><div class="card-title"> Student vs Superintendent Comparison</div>';
+
+
+        MEALS.forEach(m=>{const ssNum=todaySummary.meals[m.id]?.avg||0;const ss=ssNum?ssNum.toFixed(2):'';const sr=superTodayRatings[m.id];const supNum=sr?mean(Object.values(sr.ratings)):0;const sup=supNum?supNum.toFixed(2):'';h+=`<div class="meal-summary-row"><span class="meal-icon">${m.icon}</span><span class="meal-name">${m.name}</span><span style="font-size:12px;color:var(--muted);margin-right:8px">Students: <strong style="color:${ssNum?scoreColor(ssNum):'var(--muted)'}">${ss}</strong></span><span style="font-size:12px;color:var(--muted)">Supt.: <strong style="color:${supNum?scoreColor(supNum):'var(--muted)'}">${sup}</strong></span></div>`;});
+
+
+        h+='</div>'; form.insertAdjacentHTML('beforeend',h);
+
+
+      }
+
+
+    } catch(e){/* skip comparison if no data yet */}
+
+
+  }
+
+
+}
+
+
+function setSuperStar(cid,val){const c=document.getElementById(`sstars-${cid}`);c.dataset.val=val;c.querySelectorAll('.star').forEach(s=>s.classList.toggle('lit',parseInt(s.dataset.i)<=val));}
+
+
+async function submitSuperRating(){
+
+
+  const rats={};let ok=true;
+
+
+  SUPER_CRITERIA.forEach(c=>{const v=parseInt(document.getElementById(`sstars-${c.id}`)?.dataset.val||0);if(!v)ok=false;rats[c.id]=v;});
+
+
+  if(!ok){toast('Please rate all criteria');return;}
+
+
+  const fb=document.getElementById('superFeedbackBox').value;
+
+
+  try {
+
+
+    await apiPost('/ratings', { mealId: activeSuperMealId, criteria: rats, feedback: fb });
+
+
+    superTodayRatings[activeSuperMealId]={ratings:rats,feedback:fb};
+
+
+    toast(` Superintendent inspection for ${MEALS.find(m=>m.id===activeSuperMealId).name} recorded!`);
+
+
+    renderSuperRatePage();
+
+
+  } catch(e){ toast(` ${e.message}`); }
+
+
+}
+
+
+
+
+
+// -- DAILY SUMMARY --
+
+
+async function renderDailySummary() {
+
+
+  const container = document.getElementById('dailySummaryContent');
+
+
+  container.innerHTML = '<p style="color:var(--muted);padding:20px;text-align:center">Loading...</p>';
+
+
+  try {
+
+
+    if (session.role === 'govt') {
+
+
+      const rankings = await apiGet('/summary/rankings');
+
+
+      const ranked = (rankings||[]).map(r => ({
+
+
+        key:`${r._id.college}__${r._id.hostel}`,
+
+
+        college: COLLEGES.find(c=>c.id===r._id.college)||{id:r._id.college,name:r._id.college},
+
+
+        hostel: r._id.hostel, score: r.monthlyAvg||0,
+
+
+      }));
+
+
+      const stateAvg = mean(ranked.map(r=>r.score));
+
+
+      container.innerHTML = `<div class="report-header"><h2>&#128203; State-wide Daily Overview</h2><p>Bihar Engineering Colleges &#8212; All Messes &middot; ${today()}</p><div class="report-stats"><div class="report-stat"><div class="rs-val">${ranked.length}</div><div class="rs-label">Total Messes</div></div><div class="report-stat"><div class="rs-val">${stateAvg.toFixed(2)}</div><div class="rs-label">State Avg Score</div></div><div class="report-stat"><div class="rs-val">${ranked.filter(r=>r.score>=4).length}</div><div class="rs-label">Good Messes</div></div><div class="report-stat"><div class="rs-val">${ranked.filter(r=>r.score<3).length}</div><div class="rs-label">At Risk</div></div></div></div><div class="card"><div class="card-title">&#129302; AI State Summary</div><div class="ai-block"><div class="ai-label">AI DAILY STATE ANALYSIS</div>The state-wide average food quality score is <strong>${stateAvg.toFixed(2)}/5</strong>.<br><br><strong>${ranked.filter(r=>r.score>=4).length} messes</strong> are delivering excellent quality (>=4.0/5). <strong>${ranked.filter(r=>r.score<3).length} messes</strong> are below minimum threshold and require attention.<br><br>Use the <strong>Monthly Ranking</strong> tab for college-wise breakdown and to issue notices.</div></div>`;
+
+
+      return;
+
+
+    }
+
+
+    const dbE = await apiGet('/summary/today');
+
+
+    if (!dbE || !dbE.meals) {
+
+
+      container.innerHTML = `<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">&#128203;</div><div style="font-size:14px;font-weight:600;margin-bottom:8px">No ratings submitted today yet</div><div style="font-size:12px">College: <strong>${session.college}</strong> &middot; Hostel: <strong>${session.hostel}</strong></div><div style="font-size:12px;margin-top:6px">Be the first to rate a meal today &#8212; go to the <strong>&#11088; Rate Meal</strong> tab!</div></div>`;
+
+
+      return;
+
+
+    }
+
+
+    const studentRatedCount = Object.keys(todayRatings).length;
+
+
+    const usingOwnRatings = session.role === 'student' && studentRatedCount > 0;
+
+
+    const mealScores = MEALS.map(m => {
+
+
+      let crit, avg;
+
+
+      if (usingOwnRatings && todayRatings[m.id]) {
+
+
+        crit = todayRatings[m.id].ratings; avg = mean(Object.values(crit));
+
+
+      } else {
+
+
+        crit = dbE.meals[m.id]?.criteria || {}; avg = dbE.meals[m.id]?.avg || 0;
+
+
+      }
+
+
+      return { meal: m, crit, avg };
+
+
+    });
+
+
+    const dayAvg = mean(mealScores.map(x=>x.avg));
+
+
+    const goodCount = mealScores.filter(x=>x.avg>=4).length;
+
+
+    const poorCount = mealScores.filter(x=>x.avg<3).length;
+
+
+    const statLabel = session.role==='student'?(usingOwnRatings?`${studentRatedCount}/${MEALS.length}`:'--'):MEALS.length;
+
+
+    const statCaption = session.role==='student'?'Your Ratings':'Meals Tracked';
+
+
+    const sourceBadge = session.role==='student'?(usingOwnRatings?'<span style="font-size:11px;color:var(--good);font-weight:600;margin-left:8px">&#9679; Your ratings</span>':'<span style="font-size:11px;color:var(--muted);font-weight:600;margin-left:8px">&#9679; Hostel average</span>'):'';
+
+
+    const ratePrompt = (session.role==='student'&&!usingOwnRatings)?`<div class="card" style="background:#fefce8;border-color:#fde047;text-align:center;padding:20px;margin-bottom:0"><div style="font-size:13px;color:#a16207">&#128161; You haven't rated any meals today yet. Go to <strong>&#11088; Rate Meal</strong> tab to submit your ratings -- they will appear here.</div></div>`:'';
+
+
+    const criteriaHTML = CRITERIA.map(c=>{const vals=mealScores.map(x=>x.crit[c.id]).filter(v=>v>0);const avg=vals.length?mean(vals):0;const pct=avg?((avg/5)*100).toFixed(0):0;return `<div class="rating-bar-row"><div class="rb-label"><span>${c.icon} ${c.name}</span><span style="font-weight:700;color:${avg?scoreColor(avg):'var(--muted)'}">${avg?avg.toFixed(2):'--'}</span></div><div class="rating-bar-bg"><div class="rating-bar-fill" style="width:${pct}%;background:${avg?scoreColor(avg):'var(--border)'}"></div></div></div>`;}).join('');
+
+
+    const feedbacks = dbE.feedbacks||[];
+
+
+    const feedbackHTML = feedbacks.length===0?'<p style="color:var(--muted);font-size:13px">No feedback entries.</p>':feedbacks.map(f=>`<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="font-weight:600;color:var(--muted);font-size:11px">${f.meal}</span><span style="margin-left:8px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${f.score>=4?'#dcfce7':f.score>=3?'#fef3c7':'#fee2e2'};color:${f.score>=4?'#15803d':f.score>=3?'#b45309':'#b91c1c'}">${(f.score||0).toFixed(1)}</span><div style="margin-top:4px;color:var(--text)">"${f.text}"</div></div>`).join('');
+
+
+    container.innerHTML = `<div class="report-header"><h2>&#128203; Daily Mess Quality Report</h2><p>${session.hostel} &middot; ${COLLEGES.find(c=>c.id===session.college)?.name||''}</p><p style="margin-top:4px;opacity:0.75;font-size:12px">${today()}</p><div class="report-stats"><div class="report-stat"><div class="rs-val">${dayAvg.toFixed(2)}<span style="font-size:14px">/5</span></div><div class="rs-label">Overall Day Score</div></div><div class="report-stat"><div class="rs-val">${goodCount}</div><div class="rs-label">Good Meals</div></div><div class="report-stat"><div class="rs-val">${poorCount}</div><div class="rs-label">Poor Meals</div></div><div class="report-stat"><div class="rs-val">${statLabel}</div><div class="rs-label">${statCaption}</div></div></div></div>${ratePrompt}<div class="grid-2"><div class="card"><div class="card-title">&#127869;&#65039; Meal-wise Scores${sourceBadge}</div>${mealScores.map(x=>`<div class="meal-summary-row"><span class="meal-icon">${x.meal.icon}</span><span class="meal-name">${x.meal.name}<br><small style="color:var(--muted);font-size:11px">${x.meal.time}</small></span><span class="meal-rating-stars">${starsHTML(x.avg)}</span><span class="meal-score ${scoreClass(x.avg)}">${x.avg.toFixed(1)}</span></div>`).join('')}</div><div class="card"><div class="card-title">&#128202; Criteria Breakdown${usingOwnRatings?' <span style="font-size:11px;color:var(--good);font-weight:600">&#9679; Your ratings</span>':''}</div>${criteriaHTML}</div></div><div class="card"><div class="card-title">&#129302; AI Assistant Analysis</div><div class="ai-block"><div class="ai-label">AI DAILY SUMMARY</div>${generateDailyAI(mealScores,dayAvg,session.hostel)}</div></div><div class="card"><div class="card-title">&#128172; Student Feedback Log (Today)</div>${feedbackHTML}</div>`;
+
+
+  } catch(err) {
+
+
+    container.innerHTML = `<div class="card" style="text-align:center;padding:40px;color:var(--danger)">&#10060; Failed to load summary: ${err.message}</div>`;
+
+
+  }
+
+
+}
+
+
+function generateDailyAI(ms,dayAvg,hostel){const worst=[...ms].sort((a,b)=>a.avg-b.avg)[0];const best=[...ms].sort((a,b)=>b.avg-a.avg)[0];const cas=CRITERIA.map(c=>({c,avg:mean(ms.map(x=>x.crit[c.id]||3))}));const lo=cas.sort((a,b)=>a.avg-b.avg)[0];let assess=dayAvg>=4.2?`<strong style="color:var(--good)">Excellent (${dayAvg.toFixed(2)}/5)</strong> at ${hostel}.`:dayAvg>=3.5?`<strong style="color:var(--warn)">Good (${dayAvg.toFixed(2)}/5)</strong> at ${hostel}. Minor improvements needed.`:dayAvg>=2.5?`<strong style="color:var(--warn)">Average (${dayAvg.toFixed(2)}/5)</strong> at ${hostel}. Significant improvements needed.`:`<strong style="color:var(--danger)">Poor (${dayAvg.toFixed(2)}/5)</strong> at ${hostel}. Immediate corrective action required.`;return `${assess}<br><br>Best meal: ${best.meal.icon} ${best.meal.name} -- ${best.avg.toFixed(2)}/5<br>Needs attention: ${worst.meal.icon} ${worst.meal.name} -- ${worst.avg.toFixed(2)}/5<br>Lowest criterion: ${lo.c.icon} ${lo.c.name} -- ${lo.avg.toFixed(2)}/5<br><br>${dayAvg<3?'ALERT: Score critically low. Immediate action required.':dayAvg<3.5?'Recommendation: Focus on hygiene and ingredient freshness.':'Keep it up! Maintain current quality standards.'}`;}
+
+
+
+
+
+// -- PROGRESS --
+
+
+async function renderProgressPage() {
+
+
+  const el = document.getElementById('progressContent');
+
+
+  el.innerHTML = '<p style="color:var(--muted);padding:20px;text-align:center">Loading...</p>';
+
+
+  try {
+
+
+    const [scores, rankings] = await Promise.all([apiGet('/summary/monthly'), apiGet('/summary/rankings')]);
+
+
+    if (!scores||scores.length===0){el.innerHTML='<p style="color:var(--muted);padding:20px">No monthly data yet. Submit ratings to see progress.</p>';return;}
+
+
+    const monthAvg = mean(scores.map(d=>d.dailyAvg));
+
+
+    const key = `${session.college}__${session.hostel}`;
+
+
+    const ranked = (rankings||[]).map(r=>({key:`${r._id.college}__${r._id.hostel}`,score:r.monthlyAvg||0}));
+
+
+    const myRank = ranked.findIndex(r=>r.key===key)+1;
+
+
+    const total  = ranked.length||1;
+
+
+    const critAvgs = CRITERIA.map(c=>({c,avg:mean(scores.flatMap(d=>MEALS.map(m=>d.meals?.[m.id]?.criteria?.[c.id]||0)).filter(v=>v>0))}));
+
+
+    const weakCrit = [...critAvgs].sort((a,b)=>a.avg-b.avg).slice(0,2);
+
+
+    el.innerHTML = `<div class="report-header"><h2>&#128200; ${session.hostel} -- Performance Dashboard</h2><p>${COLLEGES.find(c=>c.id===session.college)?.name||session.college} &middot; ${thisMonth()}</p><div class="report-stats"><div class="report-stat"><div class="rs-val">${monthAvg.toFixed(2)}<span style="font-size:14px">/5</span></div><div class="rs-label">Monthly Avg</div></div><div class="report-stat"><div class="rs-val">#${myRank||'--'}/${total}</div><div class="rs-label">Rank (Bihar)</div></div><div class="report-stat"><div class="rs-val">${scores.filter(d=>d.dailyAvg>=4).length}</div><div class="rs-label">Excellent Days</div></div><div class="report-stat"><div class="rs-val">${scores.filter(d=>d.dailyAvg<3).length}</div><div class="rs-label">Poor Days</div></div></div></div><div class="grid-2"><div class="card"><div class="card-title">&#128202; Criteria Performance</div>${critAvgs.map(({c,avg})=>`<div class="rating-bar-row"><div class="rb-label"><span>${c.icon} ${c.name}</span><span style="font-weight:700;color:${scoreColor(avg)}">${avg.toFixed(2)}</span></div><div class="rating-bar-bg"><div class="rating-bar-fill" style="width:${((avg/5)*100).toFixed(0)}%;background:${scoreColor(avg)}"></div></div></div>`).join('')}</div><div class="card"><div class="card-title">&#128197; Daily Score Trend</div>${renderMiniChart(scores.map(d=>d.dailyAvg),scores.map((_,i)=>`Day ${i+1}`))}</div></div><div class="card"><div class="card-title">&#129302; AI Improvement Recommendations</div><div class="ai-block"><div class="ai-label">AI ANALYSIS FOR MANAGEMENT</div>${generateManagerAI(monthAvg,myRank,total,weakCrit,scores)}</div></div>`;
+
+
+  } catch(err){el.innerHTML=`<div class="card" style="color:var(--danger);padding:20px">&#10060; ${err.message}</div>`;}
+
+
+}
+
+
+function generateManagerAI(monthAvg,myRank,total,weakCrit,scores){const trend=scores.length>=5?mean(scores.slice(-5).map(d=>d.dailyAvg))-mean(scores.slice(0,5).map(d=>d.dailyAvg)):0;const ts=trend>0.2?'improving':trend<-0.2?'declining':'stable';const tips={taste:'Hire experienced cooks, vary recipes weekly.',hygiene:'Enforce strict kitchen sanitation protocols.',quantity:'Review portion sizes against mess menu norms.',freshness:'Source vegetables daily, avoid frozen stocks.',variety:'Follow a weekly rotating menu.',service:'Conduct staff courtesy training.'};return `Rank: <strong>#${myRank}/${total}</strong>. Score: <strong style="color:${scoreColor(monthAvg)}">${monthAvg.toFixed(2)}/5</strong>. Trend: <strong>${ts}</strong>.<br><br>Priority improvements:<br>${weakCrit.map(({c,avg})=>`&nbsp;&nbsp;- <strong>${c.icon} ${c.name}</strong> -- ${avg.toFixed(2)}/5. ${tips[c.id]||'Review with student feedback.'}`).join('<br>')}<br><br>${myRank<=3?'Outstanding! Top 3 in Bihar.':myRank<=Math.ceil(total/3)?'Good standing. Focus on consistency.':myRank<=Math.ceil(total*2/3)?'Average standing. Improvement needed to avoid notice.':'Critical standing. Warning notice may be issued if no improvement next month.'}`;}
+
+
+
+
+
+// -- MONTHLY RANKING --
+
+
+async function renderMonthlyRanking() {
+
+
+  const el = document.getElementById('monthlyContent');
+
+
+  el.innerHTML = '<p style="color:var(--muted);padding:20px;text-align:center">Loading...</p>';
+
+
+  try {
+
+
+    const rankings = await apiGet('/summary/rankings');
+
+
+    const ranked = (rankings||[]).map(r=>({
+
+
+      key:`${r._id.college}__${r._id.hostel}`,
+
+
+      college:COLLEGES.find(c=>c.id===r._id.college)||{id:r._id.college,name:r._id.college,city:''},
+
+
+      hostel:r._id.hostel, score:r.monthlyAvg||0,
+
+
+    }));
+
+
+    const total = ranked.length;
+
+
+    const b33   = Math.ceil(total*0.33);
+
+
+    const rows  = ranked.map((r,i)=>{
+
+
+      const rank=i+1;const medal=rank===1?'&#127945;':rank===2?'&#129352;':rank===3?'&#129353;':'';
+
+
+      const status=rank<=3?'pill-good':rank>total-b33?'pill-danger':'pill-warn';
+
+
+      const statusLabel=rank<=3?'Excellent':rank>total-b33?'At Risk':'Average';
+
+
+      const mine=session.hostel&&r.hostel===session.hostel&&r.college.id===session.college;
+
+
+      return `<tr style="${mine?'background:#e6faf5;font-weight:600':''}"><td><span class="rank-medal">${medal}</span><span class="rank-num" style="color:${rank<=3?'var(--gold)':'var(--text)'}">${rank}</span></td><td>${r.college.name}</td><td>${r.hostel}</td><td><span class="score-pill ${scorePillClass(r.score)}">${r.score.toFixed(2)}</span></td><td>${starsHTML(r.score)}</td><td><span class="status-pill ${status}">${statusLabel}</span></td>${session.role==='govt'?`<td><button class="btn-secondary" style="padding:4px 10px;font-size:11px" onclick="issueNotice('${r.hostel}','${r.college.name}',${r.score.toFixed(2)})">Notice</button></td>`:''}</tr>`;
+
+
+    }).join('');
+
+
+    el.innerHTML = `<div class="report-header"><h2>&#127942; Bihar Engineering College Mess Rankings</h2><p>All hostels across government engineering colleges &middot; ${thisMonth()}</p><div class="report-stats"><div class="report-stat"><div class="rs-val">${total}</div><div class="rs-label">Total Messes</div></div><div class="report-stat"><div class="rs-val">${ranked[0]?.score.toFixed(2)||'--'}</div><div class="rs-label">Top Score</div></div><div class="report-stat"><div class="rs-val">${mean(ranked.map(r=>r.score)).toFixed(2)}</div><div class="rs-label">State Average</div></div><div class="report-stat"><div class="rs-val">${ranked.filter(r=>r.score<3).length}</div><div class="rs-label">Critical</div></div></div></div><div class="card"><div class="rank-table-wrap"><table><thead><tr><th>Rank</th><th>College</th><th>Hostel</th><th>Score</th><th>Rating</th><th>Status</th>${session.role==='govt'?'<th>Action</th>':''}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
+
+
+  } catch(err){el.innerHTML=`<div class="card" style="color:var(--danger);padding:20px">&#10060; ${err.message}</div>`;}
+
+
+}
+
+
+
+
+
+// -- GOVT PANEL --
+
+
+async function renderGovtPanel() {
+
+
+  const el = document.getElementById('govtContent');
+
+
+  el.innerHTML = '<p style="color:var(--muted);padding:20px;text-align:center">Loading...</p>';
+
+
+  try {
+
+
+    const rankings = await apiGet('/summary/rankings');
+
+
+    const ranked   = (rankings||[]).map(r=>({
+
+
+      college:COLLEGES.find(c=>c.id===r._id.college)||{id:r._id.college,name:r._id.college},
+
+
+      hostel:r._id.hostel, score:r.monthlyAvg||0,
+
+
+    }));
+
+
+    const total=ranked.length;const atRisk=ranked.filter(r=>r.score<3);const critical=ranked.filter(r=>r.score<2.5);const excellent=ranked.filter(r=>r.score>=4.2);
+
+
+    el.innerHTML = `<div class="report-header"><h2>&#127963;&#65039; Government Authority Dashboard</h2><p>Bihar Department of Technical Education &middot; ${thisMonth()}</p><div class="report-stats"><div class="report-stat"><div class="rs-val">${total}</div><div class="rs-label">Total Messes</div></div><div class="report-stat"><div class="rs-val">${excellent.length}</div><div class="rs-label">Excellent</div></div><div class="report-stat"><div class="rs-val">${atRisk.length}</div><div class="rs-label">At Risk</div></div><div class="report-stat"><div class="rs-val">${critical.length}</div><div class="rs-label">Critical</div></div></div></div><div class="grid-2"><div class="card"><div class="card-title">&#9888;&#65039; Messes Requiring Action</div>${atRisk.length===0?'<p style="color:var(--good);font-size:13px">All messes performing adequately.</p>':atRisk.map(r=>{const rank=ranked.indexOf(r)+1;const isCrit=r.score<2.5;return `<div class="action-card ${isCrit?'danger':''}"><div class="ac-title">${isCrit?'&#128680;':'&#9888;&#65039;'} ${r.hostel} -- ${r.college.name}</div><div class="ac-desc">Score: <strong>${r.score.toFixed(2)}/5</strong> &middot; Rank #${rank}/${total} &middot; ${isCrit?'<span style="color:var(--danger);font-weight:700">CRITICAL</span>':'<span style="color:var(--warn)">WARNING</span>'}</div><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn-secondary" style="font-size:11px;padding:4px 12px" onclick="issueNotice('${r.hostel}','${r.college.name}',${r.score.toFixed(2)})">Warning Notice</button>${isCrit?`<button class="btn-secondary" style="font-size:11px;padding:4px 12px;color:var(--danger);border-color:var(--danger)" onclick="issueNotice('${r.hostel}','${r.college.name}',${r.score.toFixed(2)},'cancel')">Initiate Cancellation</button>`:''}</div></div>`;}).join('')}</div><div class="card"><div class="card-title">&#129302; AI Policy Recommendation</div><div class="ai-block"><div class="ai-label">AI GOVT ANALYSIS</div>${generateGovtAI(ranked,atRisk,critical,excellent)}</div></div></div>`;
+
+
+  } catch(err){el.innerHTML=`<div class="card" style="color:var(--danger);padding:20px">&#10060; ${err.message}</div>`;}
+
+
+}
+
+
+function generateGovtAI(ranked,atRisk,critical,excellent){const avg=mean(ranked.map(r=>r.score));return `State average: <strong>${avg.toFixed(2)}/5</strong>.<br><br>${excellent.length} messes excellent (>=4.2/5).<br>${atRisk.length} messes below 3.0/5 -- intervention needed.${critical.length>0?`<br>${critical.length} messes critically below 2.5/5.`:''}<br><br>Recommended actions:<br>&nbsp;1. Issue warning notices to all messes below 3.0/5.<br>&nbsp;2. Physical inspection of messes below 2.5/5 within 7 days.<br>&nbsp;3. Improvement plans from bottom-third mess managers.<br>&nbsp;4. Two consecutive months below 3.0/5 -- initiate agreement cancellation.<br>&nbsp;5. Publish rankings on Bihar DTE portal for transparency.`;}
+
+
+
+
+
+// -- NOTICES --
+
+
+async function issueNotice(hostel, college, score, type='warn') {
+
+
+  try {
+
+
+    await apiPost('/notices', { hostel, college, score: parseFloat(score), type });
+
+
+    toast(type==='cancel'?'Cancellation notice issued':'Warning notice issued');
+
+
+    switchPage('notices');
+
+
+  } catch(e) { toast('Error: '+e.message); }
+
+
+}
+
+
+async function renderNoticesPage() {
+
+
+  const container = document.getElementById('noticesContent');
+
+
+  container.innerHTML = '<p style="color:var(--muted);padding:20px;text-align:center">Loading...</p>';
+
+
+  try {
+
+
+    const notices = await apiGet('/notices');
+
+
+    const visible = notices||[];
+
+
+    const pCard = (session.role==='manager'||session.role==='super') ? (()=>{const p=getPersons(session.college);return `<div class="card" style="margin-bottom:16px;border-left:4px solid var(--accent)"><div class="card-title">&#128100; Mess Contact Details</div><div style="font-size:13px;line-height:2"><strong>Manager:</strong> ${p.manager.name} | ID: ${p.manager.id} | ${p.manager.phone}<br><strong>Superintendent:</strong> ${p.super.name} | ID: ${p.super.id} | ${p.super.phone}</div></div>`;})() : '';
+
+
+    const nHTML = visible.length===0?`<div class="card" style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:12px">&#128237;</div><div>No notices ${session.role==='govt'?'issued yet.':'for your hostel this month. Keep it up!'}</div></div>`:visible.map(n=>`<div class="card" style="border-left:4px solid ${n.type==='cancel'?'var(--danger)':'var(--warn)'}"><div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap"><div style="font-size:28px">${n.type==='cancel'?'&#128683;':'&#9888;&#65039;'}</div><div style="flex:1"><div style="font-size:14px;font-weight:700;margin-bottom:4px">${n.type==='cancel'?'AGREEMENT CANCELLATION NOTICE':'OFFICIAL WARNING NOTICE'}</div><div style="font-size:13px;color:var(--muted);margin-bottom:10px">${n.date||new Date(n.createdAt).toLocaleDateString('en-IN')} &middot; ${n.issuedBy}</div><div style="font-size:13px;line-height:1.8"><strong>To:</strong> Mess Manager &amp; Superintendent, <em>${n.hostel}</em><br><strong>Institution:</strong> ${n.college}<br><strong>Subject:</strong> ${n.type==='cancel'?'Cancellation of Mess Agreement':'Warning regarding poor food quality'}<br><br>This is to officially ${n.type==='cancel'?'notify you that the mess agreement is being <strong style="color:var(--danger)">terminated with immediate effect</strong>':'warn your establishment regarding <strong>substandard food quality</strong>'}. Score: <strong style="color:${scoreColor(+n.score||0)}">${(+n.score||0).toFixed(2)}/5</strong> -- below threshold of 3.0/5.${n.type!=='cancel'?'<br><br>Failure to improve will result in cancellation under Bihar Govt Hostel Mess Contract clauses.':''}<br><br><em>-- Bihar Department of Technical Education</em></div></div></div></div>`).join('');
+
+
+    container.innerHTML = `<div class="section-title">Official Notices -- ${session.role==='govt'?`All Messes (${visible.length} notices)`:session.hostel}</div>${pCard}${nHTML}`;
+
+
+  } catch(err){container.innerHTML=`<div class="card" style="color:var(--danger);padding:20px">&#10060; ${err.message}</div>`;}
+
+
+}
+
+
+//  MINI CHART 
+
+
+function renderMiniChart(data,labels){const W=400,H=100,pL=30,pR=8,pT=8,pB=20;const maxV=Math.min(5,Math.max(...data)*1.05);const minV=Math.max(0,Math.min(...data)*0.95);const xS=(W-pL-pR)/Math.max(data.length-1,1);const yS=(H-pT-pB)/(maxV-minV||1);const px=i=>pL+i*xS;const py=v=>H-pB-(v-minV)*yS;let path=`M ${px(0)} ${py(data[0])}`;for(let i=1;i<data.length;i++)path+=` L ${px(i)} ${py(data[i])}`;const area=path+` L ${px(data.length-1)} ${H-pB} L ${px(0)} ${H-pB} Z`;const grid=[1,2,3,4,5].filter(v=>v>=minV&&v<=maxV).map(v=>`<line x1="${pL}" x2="${W-pR}" y1="${py(v)}" y2="${py(v)}" stroke="#c6e6d8" stroke-width="1"/><text x="${pL-4}" y="${py(v)+4}" text-anchor="end" font-size="9" fill="#5a7a6e">${v}</text>`).join('');const dots=data.map((v,i)=>`<circle cx="${px(i)}" cy="${py(v)}" r="2.5" fill="${scoreColor(v)}"/>`).join('');return`<svg class="mini-chart" viewBox="0 0 ${W} ${H}">${grid}<path d="${area}" fill="#0f766e11"/><path d="${path}" fill="none" stroke="#0f766e" stroke-width="1.5"/>${dots}</svg>`;}
+
+
+</script>
+
+
+</body>
+
+
+</html>
+
+

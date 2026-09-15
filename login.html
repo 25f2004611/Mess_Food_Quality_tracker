@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mess Food Monitoring System — Login</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #0f766e;
+      --accent-hover: #0d6460;
+      --bg-grad-a: #134e4a;
+      --bg-grad-b: #0f766e;
+      --bg-grad-c: #d97706;
+      --border: #c6e6d8;
+      --text: #0d2b20;
+      --muted: #5a7a6e;
+      --danger: #b91c1c;
+      --good: #15803d;
+      --surface2: #e8f5ef;
+    }
+    body {
+      font-family: -apple-system,"Segoe UI",system-ui,sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 55%, var(--bg-grad-c) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: white;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    /* ── TAB SWITCHER (Login / Sign Up) ── */
+    .auth-tabs {
+      display: flex;
+      background: var(--surface2);
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 14px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--muted);
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .auth-tab.active {
+      background: white;
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ── FORM PANELS ── */
+    .auth-panel { display: none; padding: 32px 36px 28px; }
+    .auth-panel.active { display: block; }
+
+    .logo { text-align: center; margin-bottom: 24px; }
+    .logo .brand { font-size: 22px; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+    .logo .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 14px;
+      color: var(--text); background: white;
+      outline: none; transition: border 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── ROLE TABS ── */
+    .role-tabs { display: flex; gap: 7px; margin-bottom: 18px; }
+    .role-tab {
+      flex: 1; padding: 8px 4px;
+      border: 2px solid var(--border); border-radius: 8px;
+      text-align: center; cursor: pointer;
+      font-size: 11px; font-weight: 700;
+      color: var(--muted); transition: all 0.2s;
+    }
+    .role-tab.active { border-color: var(--accent); color: var(--accent); background: #e6faf5; }
+    .role-tab .icon { font-size: 16px; display: block; margin-bottom: 2px; }
+
+    /* ── BUTTONS ── */
+    .btn-main {
+      width: 100%; padding: 12px;
+      background: var(--accent); color: white;
+      border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+      margin-top: 4px;
+    }
+    .btn-main:hover { background: var(--accent-hover); }
+    .btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── QUICK DEMO ── */
+    .demo-section {
+      margin-top: 18px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 14px;
+    }
+    .demo-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .btn-demo {
+      padding: 7px 8px; background: var(--surface2);
+      border: 1.5px solid var(--border); border-radius: 7px;
+      font-size: 11px; font-weight: 700; color: var(--text);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-demo:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: white; padding: 11px 22px;
+      border-radius: 30px; font-size: 13px; font-weight: 600;
+      z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+    #toast.error { background: #7f1d1d; }
+    #toast.success { background: #14532d; }
+
+    /* ── ERROR / SUCCESS messages ── */
+    .msg {
+      font-size: 12px; padding: 9px 12px;
+      border-radius: 7px; margin-bottom: 14px;
+      display: none;
+    }
+    .msg.error { background: #fee2e2; color: #b91c1c; display: block; }
+    .msg.success { background: #dcfce7; color: #15803d; display: block; }
+
+    /* Password strength */
+    .pw-strength { height: 4px; border-radius: 4px; margin-top: 5px; background: #e5e7eb; overflow: hidden; }
+    .pw-strength-fill { height: 100%; border-radius: 4px; transition: width 0.3s, background 0.3s; width: 0; }
+
+    .already { text-align: center; font-size: 12px; color: var(--muted); margin-top: 14px; }
+    .already a { color: var(--accent); font-weight: 700; cursor: pointer; text-decoration: none; }
+    .already a:hover { text-decoration: underline; }
+
+    /* Govt-only sign-up info box */
+    .govt-notice {
+      background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px;
+      padding: 12px 14px; font-size: 12px; color: #92400e;
+      margin-bottom: 16px; display: none;
+    }
+    .govt-notice.show { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- Tab switcher -->
+  <div class="auth-tabs">
+    <div class="auth-tab active" id="tab-login" onclick="showPanel('login')">🔑 Sign In</div>
+    <div class="auth-tab" id="tab-signup" onclick="showPanel('signup')">✏️ Sign Up</div>
+  </div>
+
+  <!-- ── LOGIN PANEL ── -->
+  <div class="auth-panel active" id="panel-login">
+    <div class="logo">
+      <div class="brand">🍽️ Mess Food Monitoring System</div>
+      <div class="sub">Bihar Engineering Colleges · Govt. of Bihar · Dept. of Technical Education</div>
+    </div>
+
+    <div id="loginMsg" class="msg"></div>
+
+    <div class="role-tabs">
+      <div class="role-tab active" data-role="student" onclick="selectRole('student',this,'login')">
+        <span class="icon">🎓</span>Student
+      </div>
+      <div class="role-tab" data-role="manager" onclick="selectRole('manager',this,'login')">
+        <span class="icon">👨‍🍳</span>Manager
+      </div>
+      <div class="role-tab" data-role="super" onclick="selectRole('super',this,'login')">
+        <span class="icon">🏫</span>Supt.
+      </div>
+      <div class="role-tab" data-role="govt" onclick="selectRole('govt',this,'login')">
+        <span class="icon">🏛️</span>Govt.
+      </div>
+    </div>
+
+    <div class="form-group" id="lg-college-group">
+      <label>College</label>
+      <select id="lg-college" onchange="populateHostels('lg-hostel','lg-college')">
+        <option value="">-- Select College --</option>
+      </select>
+    </div>
+    <div class="form-group" id="lg-hostel-group">
+      <label>Hostel</label>
+      <select id="lg-hostel">
+        <option value="">-- Select Hostel --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label id="lg-id-label">Student ID / Roll No.</label>
+      <input type="text" id="lg-id" placeholder="e.g. 22BCSE001" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="lg-pass" placeholder="Enter password"
+             onkeydown="if(event.key==='Enter') doLogin()" />
+    </div>
+
+    <button class="btn-main" id="btnLogin" onclick="doLogin()">Sign In →</button>
+
+    <div class="demo-section">
+      <div class="demo-label">Quick Demo Login</div>
+      <div class="demo-grid">
+        <button class="btn-demo" onclick="quickLogin('student')">🎓 Student</button>
+        <button class="btn-demo" onclick="quickLogin('manager')">👨‍🍳 Manager</button>
+        <button class="btn-demo" onclick="quickLogin('super')">🏫 Superintendent</button>
+        <button class="btn-demo" onclick="quickLogin('govt')">🏛️ Govt. Authority</button>
+      </div>
+    </div>
+
+    <div class="already">New user? <a onclick="showPanel('signup')">Create an account</a></div>
+  </div>
+
+  <!-- ── SIGN UP PANEL ── -->
+  <!-- NOTE: Govt. Authority accounts are pre-existing and cannot be created here. -->
+  <div class="auth-panel" id="panel-signup">
+    <div class="logo">
+      <div class="brand">🍽️ Create Your Account</div>
+      <div class="sub">Register as a new user — Mess Food Monitoring System</div>
+    </div>
+
+    <div id="signupMsg" class="msg"></div>
+
+    <!-- Govt-only info notice (shown when user picks Govt role in sign-up) -->
+    <div class="govt-notice" id="govtSignupNotice">
+      🏛️ <strong>Government Authority accounts are pre-existing.</strong><br>
+      Please use the <strong>Sign In</strong> tab with your issued credentials.
+      Contact Bihar DTE to obtain your login details.
+    </div>
+
+    <div class="role-tabs" id="su-role-tabs">
+      <div class="role-tab active" data-role="student" onclick="selectRole('student',this,'signup')">
+        <span class="icon">🎓</span>Student
+      </div>
+      <div class="role-tab" data-role="manager" onclick="selectRole('manager',this,'signup')">
+        <span class="icon">👨‍🍳</span>Manager
+      </div>
+      <div class="role-tab" data-role="super" onclick="selectRole('super',this,'signup')">
+        <span class="icon">🏫</span>Supt.
+      </div>
+      <!-- Govt tab visible but clicking it shows the notice and disables the form -->
+      <div class="role-tab" data-role="govt" onclick="selectRole('govt',this,'signup')">
+        <span class="icon">🏛️</span>Govt.
+      </div>
+    </div>
+
+    <div id="su-form-fields">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="su-fname" placeholder="Rohit" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="su-lname" placeholder="Kumar" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="su-email" placeholder="rohit@college.edu.in" />
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="su-phone" placeholder="9431XXXXXX" maxlength="10" />
+      </div>
+
+      <div class="form-group" id="su-college-group">
+        <label>College</label>
+        <select id="su-college" onchange="populateHostels('su-hostel','su-college')">
+          <option value="">-- Select College --</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="su-hostel-group">
+        <label>Hostel</label>
+        <select id="su-hostel">
+          <option value="">-- Select Hostel --</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="su-id-group">
+        <label id="su-id-label">Student ID / Roll No.</label>
+        <input type="text" id="su-id" placeholder="e.g. 22BCSE001" />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="su-pass" placeholder="Min. 6 characters" oninput="checkPwStrength(this.value)" />
+        <div class="pw-strength"><div class="pw-strength-fill" id="pwBar"></div></div>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="su-pass2" placeholder="Re-enter password" />
+      </div>
+
+      <button class="btn-main" id="btnSignup" onclick="doSignup()">Create Account →</button>
+    </div><!-- /#su-form-fields -->
+
+    <div class="already">Already have an account? <a onclick="showPanel('login')">Sign in</a></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+// Auto-detect: if served from Express the origin IS the API; otherwise assume localhost:5000
+const API_BASE = window.location.port === '5000' || window.location.protocol === 'file:'
+  ? 'http://localhost:5000/api'
+  : `${window.location.origin}/api`;
+
+// ── STATIC DATA (for dropdowns only — not for auth logic) ────────────────────
+const COLLEGES = [
+  { id:'bce',     name:'Bakhtiyarpur College of Engineering, Patna' },
+  { id:'mit',     name:'Muzaffarpur Institute of Technology, Muzaffarpur' },
+  { id:'dce',     name:'Darbhanga College of Engineering, Darbhanga' },
+  { id:'nce',     name:'Nalanda College of Engineering, Chandi' },
+  { id:'pec',     name:'Purnea College of Engineering, Purnea' },
+  { id:'gce-bh',  name:'Govt. Engineering College, Bhagalpur' },
+  { id:'gce-ga',  name:'Govt. Engineering College, Gaya' },
+  { id:'gce-va',  name:'Govt. Engineering College, Vaishali (Hajipur)' },
+  { id:'gce-nw',  name:'Govt. Engineering College, Nawada' },
+  { id:'gce-sm',  name:'Govt. Engineering College, Samastipur' },
+  { id:'gce-bx',  name:'Govt. Engineering College, Buxar' },
+  { id:'gce-jh',  name:'Govt. Engineering College, Jehanabad' },
+  { id:'gce-sh',  name:'Govt. Engineering College, Sheikhpura' },
+  { id:'gce-si',  name:'Govt. Engineering College, Sitamarhi' },
+  { id:'gce-su',  name:'Govt. Engineering College, Supaul' },
+  { id:'gce-ki',  name:'Govt. Engineering College, Kishanganj' },
+  { id:'gce-ar',  name:'Govt. Engineering College, Araria' },
+  { id:'gce-ka',  name:'Govt. Engineering College, Kaimur (Bhabua)' },
+  { id:'gce-ct',  name:'Govt. Engineering College, East Champaran (Motihari)' },
+  { id:'gce-sa',  name:'Govt. Engineering College, Saharsa' },
+  { id:'gce-mu',  name:'Govt. Engineering College, Munger' },
+  { id:'gce-ro',  name:'Govt. Engineering College, Rohtas (Sasaram)' },
+  { id:'gce-au',  name:'Govt. Engineering College, Aurangabad' },
+  { id:'gce-ja',  name:'Govt. Engineering College, Jamui' },
+  { id:'gce-lk',  name:'Govt. Engineering College, Lakhisarai' },
+  { id:'gce-sh2', name:'Govt. Engineering College, Sheohar' },
+  { id:'gce-mp',  name:'Govt. Engineering College, Madhepura' },
+  { id:'gce-go',  name:'Govt. Engineering College, Gopalganj' },
+  { id:'gce-wc',  name:'Govt. Engineering College, West Champaran (Bettiah)' },
+  { id:'gce-ma',  name:'Govt. Engineering College, Madhubani' },
+  { id:'gce-be',  name:'Govt. Engineering College, Begusarai' },
+  { id:'gce-kh',  name:'Govt. Engineering College, Khagaria' },
+  { id:'mce',     name:'Motihari College of Engineering, Motihari' },
+  { id:'biet',    name:'Bhagalpur College of Engineering, Bhagalpur' },
+];
+const HOSTELS = {
+  'bce':    ['Boys Hostel 1','Boys Hostel 2','Boys Hostel 3','Girls Hostel 1'],
+  'mit':    ['Boys Hostel 1','Boys Hostel 2','Boys Hostel 3','Girls Hostel 1'],
+  'dce':    ['Boys Hostel 1','Boys Hostel 2','Boys Hostel 3','Girls Hostel 1'],
+  'nce':    ['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+  'pec':    ['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+  'gce-bh': ['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+  'gce-ga': ['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+  'gce-va': ['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+  'biet':   ['Boys Hostel 1','Boys Hostel 2','Girls Hostel 1'],
+};
+COLLEGES.forEach(c => { if (!HOSTELS[c.id]) HOSTELS[c.id] = ['Boys Hostel 1','Girls Hostel 1']; });
+
+// ── Populate college dropdowns ────────────────────────────────────────────────
+['lg-college','su-college'].forEach(id => {
+  const sel = document.getElementById(id);
+  COLLEGES.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id; opt.textContent = c.name;
+    sel.appendChild(opt);
+  });
+});
+
+function populateHostels(hostelId, collegeId) {
+  const col = document.getElementById(collegeId).value;
+  const sel = document.getElementById(hostelId);
+  sel.innerHTML = '<option value="">-- Select Hostel --</option>';
+  (HOSTELS[col] || []).forEach(h => {
+    const opt = document.createElement('option');
+    opt.value = h; opt.textContent = h;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Panel / Role state ────────────────────────────────────────────────────────
+let loginRole  = 'student';
+let signupRole = 'student';
+
+function showPanel(panel) {
+  document.getElementById('panel-login').classList.toggle('active', panel === 'login');
+  document.getElementById('panel-signup').classList.toggle('active', panel === 'signup');
+  document.getElementById('tab-login').classList.toggle('active', panel === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', panel === 'signup');
+  clearMsg('loginMsg'); clearMsg('signupMsg');
+}
+
+function selectRole(role, el, context) {
+  if (context === 'login') loginRole = role;
+  else signupRole = role;
+
+  const prefix = context === 'login' ? 'lg' : 'su';
+  el.closest('.role-tabs').querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  const isGovt = role === 'govt';
+
+  if (context === 'signup') {
+    // Show the govt notice and hide/disable the form fields
+    document.getElementById('govtSignupNotice').classList.toggle('show', isGovt);
+    document.getElementById('su-form-fields').style.display = isGovt ? 'none' : 'block';
+    return;
+  }
+
+  // Login: hide college/hostel for govt
+  if (document.getElementById(`${prefix}-college-group`))
+    document.getElementById(`${prefix}-college-group`).style.display = isGovt ? 'none' : 'block';
+  if (document.getElementById(`${prefix}-hostel-group`))
+    document.getElementById(`${prefix}-hostel-group`).style.display = isGovt ? 'none' : 'block';
+
+  const idLabel = document.getElementById(`${prefix}-id-label`);
+  const idInput = document.getElementById(`${prefix}-id`);
+  if (idLabel && idInput) {
+    const labels       = { student:'Student ID / Roll No.', manager:'Manager ID', super:'Superintendent ID', govt:'Government User ID' };
+    const placeholders = { student:'e.g. 22BCSE001', manager:'e.g. MGR-BCE-001', super:'e.g. SUP-BCE-001', govt:'e.g. GOVT-DTE-2024' };
+    idLabel.textContent = labels[role];
+    idInput.placeholder = placeholders[role];
+  }
+}
+
+// ── Toast / messages ──────────────────────────────────────────────────────────
+function toast(msg, type = '', dur = 3000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  setTimeout(() => { el.className = ''; }, dur);
+}
+function showMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.className = `msg ${type}`;
+}
+function clearMsg(id) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = ''; el.className = 'msg'; }
+}
+
+// ── Password strength ─────────────────────────────────────────────────────────
+function checkPwStrength(val) {
+  const bar = document.getElementById('pwBar');
+  let score = 0;
+  if (val.length >= 6)  score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const colors = ['#ef4444','#f97316','#eab308','#22c55e','#15803d'];
+  bar.style.width = (score * 20) + '%';
+  bar.style.background = colors[score - 1] || '#e5e7eb';
+}
+
+// ── API helper ────────────────────────────────────────────────────────────────
+async function apiPost(endpoint, body) {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Request failed.');
+  return data;
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  clearMsg('loginMsg');
+  const college = document.getElementById('lg-college').value;
+  const hostel  = document.getElementById('lg-hostel').value;
+  const userId  = document.getElementById('lg-id').value.trim();
+  const password = document.getElementById('lg-pass').value;
+
+  if (loginRole !== 'govt' && !college) { showMsg('loginMsg', 'Please select a college.', 'error'); return; }
+  if (['student','manager','super'].includes(loginRole) && !hostel) { showMsg('loginMsg', 'Please select a hostel.', 'error'); return; }
+  if (!userId)   { showMsg('loginMsg', 'Please enter your ID.', 'error'); return; }
+  if (!password) { showMsg('loginMsg', 'Please enter your password.', 'error'); return; }
+
+  const btn = document.getElementById('btnLogin');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+
+  try {
+    const data = await apiPost('/auth/login', { userId, password, role: loginRole, college, hostel });
+    // Store JWT + session info in localStorage
+    localStorage.setItem('mfms_token', data.token);
+    localStorage.setItem('mfms_session', JSON.stringify(data.user));
+    toast('✅ Login successful! Redirecting…', 'success', 1200);
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+  } catch (err) {
+    showMsg('loginMsg', err.message, 'error');
+    btn.disabled = false; btn.textContent = 'Sign In →';
+  }
+}
+
+// ── SIGN UP ───────────────────────────────────────────────────────────────────
+async function doSignup() {
+  clearMsg('signupMsg');
+
+  if (signupRole === 'govt') {
+    showMsg('signupMsg', 'Government accounts cannot be created. Please use Sign In.', 'error');
+    return;
+  }
+
+  const fname   = document.getElementById('su-fname').value.trim();
+  const lname   = document.getElementById('su-lname').value.trim();
+  const email   = document.getElementById('su-email').value.trim();
+  const phone   = document.getElementById('su-phone').value.trim();
+  const college = document.getElementById('su-college').value;
+  const hostel  = document.getElementById('su-hostel').value;
+  const userId  = document.getElementById('su-id').value.trim();
+  const password = document.getElementById('su-pass').value;
+  const pass2   = document.getElementById('su-pass2').value;
+
+  if (!fname || !lname)              { showMsg('signupMsg', 'Please enter your full name.', 'error'); return; }
+  if (!email || !email.includes('@')) { showMsg('signupMsg', 'Please enter a valid email address.', 'error'); return; }
+  if (!phone || phone.length < 10)   { showMsg('signupMsg', 'Please enter a valid 10-digit phone number.', 'error'); return; }
+  if (!college)                      { showMsg('signupMsg', 'Please select your college.', 'error'); return; }
+  if (!hostel)                       { showMsg('signupMsg', 'Please select your hostel.', 'error'); return; }
+  if (!userId)                       { showMsg('signupMsg', 'Please enter your ID.', 'error'); return; }
+  if (password.length < 6)           { showMsg('signupMsg', 'Password must be at least 6 characters.', 'error'); return; }
+  if (password !== pass2)            { showMsg('signupMsg', 'Passwords do not match.', 'error'); return; }
+
+  const btn = document.getElementById('btnSignup');
+  btn.disabled = true; btn.textContent = 'Creating account…';
+
+  try {
+    await apiPost('/auth/signup', {
+      userId, password, role: signupRole, college, hostel,
+      name: `${fname} ${lname}`, email, phone,
+    });
+    showMsg('signupMsg', `✅ Account created! Welcome, ${fname}. You can now sign in.`, 'success');
+    toast('✅ Account created!', 'success');
+    setTimeout(() => {
+      document.getElementById('lg-id').value = userId;
+      document.getElementById('lg-pass').value = password;
+      const tab = document.querySelector(`#panel-login .role-tab[data-role="${signupRole}"]`);
+      if (tab) selectRole(signupRole, tab, 'login');
+      if (college) {
+        document.getElementById('lg-college').value = college;
+        populateHostels('lg-hostel', 'lg-college');
+        setTimeout(() => { document.getElementById('lg-hostel').value = hostel; }, 60);
+      }
+      showPanel('login');
+    }, 1500);
+  } catch (err) {
+    showMsg('signupMsg', err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Create Account →';
+  }
+}
+
+// ── QUICK DEMO LOGIN ──────────────────────────────────────────────────────────
+const DEMO_CREDS = {
+  student: { userId:'22BCSE001',   password:'pass123', role:'student', college:'bce', hostel:'Boys Hostel 1' },
+  manager: { userId:'MGR-BCE-001', password:'pass123', role:'manager', college:'bce', hostel:'Boys Hostel 1' },
+  super:   { userId:'SUP-BCE-001', password:'pass123', role:'super',   college:'bce', hostel:'Boys Hostel 1' },
+  govt:    { userId:'GOVT-DTE-2024', password:'pass123', role:'govt',  college:'',   hostel:'' },
+};
+
+function quickLogin(role) {
+  const c = DEMO_CREDS[role];
+  const tab = document.querySelector(`#panel-login .role-tab[data-role="${role}"]`);
+  if (tab) selectRole(role, tab, 'login');
+
+  if (c.college) {
+    document.getElementById('lg-college').value = c.college;
+    populateHostels('lg-hostel', 'lg-college');
+  }
+  setTimeout(() => {
+    if (c.hostel) document.getElementById('lg-hostel').value = c.hostel;
+    document.getElementById('lg-id').value = c.userId;
+    document.getElementById('lg-pass').value = c.password;
+    doLogin();
+  }, 60);
+}
+
+// ── If already logged in (valid token exists), go to dashboard ────────────────
+if (localStorage.getItem('mfms_token') && localStorage.getItem('mfms_session')) {
+  window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>
